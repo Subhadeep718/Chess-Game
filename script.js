@@ -20,6 +20,8 @@ $(document).ready(function () {
         },
     };
 
+    let currentPlayer = "white"; // Start with white's turn
+
     // Create the chessboard
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
@@ -34,43 +36,69 @@ $(document).ready(function () {
 
     // Set initial positions
     function setupPieces() {
-        const rows = $(".square");
+        const squares = $(".square");
         // Black pieces
-        rows.eq(0).text(pieces.black.rook);
-        rows.eq(1).text(pieces.black.knight);
-        rows.eq(2).text(pieces.black.bishop);
-        rows.eq(3).text(pieces.black.queen);
-        rows.eq(4).text(pieces.black.king);
-        rows.eq(5).text(pieces.black.bishop);
-        rows.eq(6).text(pieces.black.knight);
-        rows.eq(7).text(pieces.black.rook);
-        for (let i = 8; i < 16; i++) rows.eq(i).text(pieces.black.pawns);
+        squares.eq(0).text(pieces.black.rook);
+        squares.eq(1).text(pieces.black.knight);
+        squares.eq(2).text(pieces.black.bishop);
+        squares.eq(3).text(pieces.black.queen);
+        squares.eq(4).text(pieces.black.king);
+        squares.eq(5).text(pieces.black.bishop);
+        squares.eq(6).text(pieces.black.knight);
+        squares.eq(7).text(pieces.black.rook);
+        for (let i = 8; i < 16; i++) squares.eq(i).text(pieces.black.pawns);
 
         // White pieces
-        rows.eq(56).text(pieces.white.rook);
-        rows.eq(57).text(pieces.white.knight);
-        rows.eq(58).text(pieces.white.bishop);
-        rows.eq(59).text(pieces.white.queen);
-        rows.eq(60).text(pieces.white.king);
-        rows.eq(61).text(pieces.white.bishop);
-        rows.eq(62).text(pieces.white.knight);
-        rows.eq(63).text(pieces.white.rook);
-        for (let i = 48; i < 56; i++) rows.eq(i).text(pieces.white.pawns);
+        squares.eq(56).text(pieces.white.rook);
+        squares.eq(57).text(pieces.white.knight);
+        squares.eq(58).text(pieces.white.bishop);
+        squares.eq(59).text(pieces.white.queen);
+        squares.eq(60).text(pieces.white.king);
+        squares.eq(61).text(pieces.white.bishop);
+        squares.eq(62).text(pieces.white.knight);
+        squares.eq(63).text(pieces.white.rook);
+        for (let i = 48; i < 56; i++) squares.eq(i).text(pieces.white.pawns);
     }
     setupPieces();
+
+    // Check the piece's color
+    function getPieceColor(piece) {
+        if (Object.values(pieces.white).includes(piece)) return "white";
+        if (Object.values(pieces.black).includes(piece)) return "black";
+        return null;
+    }
 
     // Handle piece movement
     let selectedSquare = null;
     $(".square").on("click", function () {
-        if (selectedSquare === null && $(this).text().trim() !== "") {
+        const clickedSquare = $(this);
+        const clickedPiece = clickedSquare.text().trim();
+        const clickedPieceColor = getPieceColor(clickedPiece);
+
+        if (selectedSquare === null) {
             // Select a piece
-            selectedSquare = $(this);
-            $(this).addClass("selected");
-        } else if (selectedSquare) {
-            // Move the selected piece
-            $(this).text(selectedSquare.text());
-            selectedSquare.text("");
-            selectedSquare.removeClass("selected");
+            if (clickedPiece !== "" && clickedPieceColor === currentPlayer) {
+                selectedSquare = clickedSquare;
+                clickedSquare.addClass("selected");
+            } else {
+                alert(`It's ${currentPlayer}'s turn!`);
+            }
+        } else {
+            // Try to move the selected piece
+            const selectedPiece = selectedSquare.text().trim();
+
+            if (clickedSquare !== selectedSquare) {
+                // Move the piece
+                clickedSquare.text(selectedPiece);
+                selectedSquare.text("");
+                selectedSquare.removeClass("selected");
+
+                // Switch turns
+                currentPlayer = currentPlayer === "white" ? "black" : "white";
+            } else {
+                // Deselect if clicked again
+                selectedSquare.removeClass("selected");
+            }
             selectedSquare = null;
         }
     });
