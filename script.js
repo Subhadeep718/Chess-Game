@@ -21,6 +21,7 @@ $(document).ready(function () {
     };
 
     let currentPlayer = "white"; // Start with white's turn
+    let selectedSquare = null;
 
     // Create the chessboard
     for (let row = 0; row < 8; row++) {
@@ -68,15 +69,14 @@ $(document).ready(function () {
         return null;
     }
 
-    // Handle piece movement
-    let selectedSquare = null;
+    // Handle piece selection and movement
     $(".square").on("click", function () {
         const clickedSquare = $(this);
         const clickedPiece = clickedSquare.text().trim();
         const clickedPieceColor = getPieceColor(clickedPiece);
 
         if (selectedSquare === null) {
-            // Select a piece
+            // No piece selected yet - allow selecting a piece
             if (clickedPiece !== "" && clickedPieceColor === currentPlayer) {
                 selectedSquare = clickedSquare;
                 clickedSquare.addClass("selected");
@@ -84,22 +84,30 @@ $(document).ready(function () {
                 alert(`It's ${currentPlayer}'s turn!`);
             }
         } else {
-            // Try to move the selected piece
-            const selectedPiece = selectedSquare.text().trim();
-
-            if (clickedSquare !== selectedSquare) {
-                // Move the piece
-                clickedSquare.text(selectedPiece);
-                selectedSquare.text("");
+            // Piece already selected - try to move
+            if (clickedSquare === selectedSquare) {
+                // Deselect if clicking the same square
                 selectedSquare.removeClass("selected");
-
-                // Switch turns
-                currentPlayer = currentPlayer === "white" ? "black" : "white";
+                selectedSquare = null;
             } else {
-                // Deselect if clicked again
-                selectedSquare.removeClass("selected");
+                // Move piece if valid
+                const selectedPiece = selectedSquare.text().trim();
+                const targetPiece = clickedSquare.text().trim();
+                const targetPieceColor = getPieceColor(targetPiece);
+
+                if (targetPiece === "" || targetPieceColor !== currentPlayer) {
+                    // Empty square or opponent's piece
+                    clickedSquare.text(selectedPiece);
+                    selectedSquare.text("");
+                    selectedSquare.removeClass("selected");
+                    selectedSquare = null;
+
+                    // Switch turns
+                    currentPlayer = currentPlayer === "white" ? "black" : "white";
+                } else {
+                    alert(`You cannot capture your own piece!`);
+                }
             }
-            selectedSquare = null;
         }
     });
 });
