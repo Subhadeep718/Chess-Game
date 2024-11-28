@@ -20,6 +20,39 @@ $(document).ready(function () {
         }
     }
 
+    // Function to display a message in the suggestion box
+function showMessage(message) {
+    const messageBox = $("#message-box");
+    messageBox.text(message).fadeIn();
+
+    // Auto-hide the message after 3 seconds
+    setTimeout(() => {
+        messageBox.fadeOut();
+    }, 3000);
+}
+
+// Replace alert with showMessage
+if (selectedSquare === null) {
+    if (clickedPiece !== "" && clickedPieceColor === currentPlayer) {
+        selectedSquare = clickedSquare;
+        clickedSquare.addClass("selected");
+    } else {
+        showMessage(`It's ${currentPlayer}'s turn!`);
+    }
+} else {
+    if (isValidMove(selectedPiece, selectedRow, selectedCol, clickedRow, clickedCol, clickedPiece)) {
+        clickedSquare.text(selectedPiece);
+        selectedSquare.text("");
+        selectedSquare.removeClass("selected");
+        selectedSquare = null;
+
+        // Switch turns
+        currentPlayer = currentPlayer === "white" ? "black" : "white";
+    } else {
+        showMessage("Invalid move!");
+    }
+}
+    
     // Set initial positions
     function setupPieces() {
         const squares = $(".square");
