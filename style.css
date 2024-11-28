@@ -41,3 +41,18 @@ body {
 .square.white {
     background-color: #eeeed2;
 }
+
+#message-box {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f9f9f9;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
